@@ -42,8 +42,20 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="mb-3">
+                                    <label for="description">Short Description</label>
+                                    <textarea value="{{ $product->short_description }}" name="short_description" id="short_description" cols="30" rows="10" class="summernote" placeholder="short_descrition">{{ $product->short_description }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
                                     <label for="description">Description</label>
-                                    <textarea value="{{ $product->description }}" name="description" id="description" cols="30" rows="10" class="summernote" placeholder="Description"></textarea>
+                                    <textarea value="{{ $product->description }}" name="description" id="description" cols="30" rows="10" class="summernote" placeholder="Description">{{ $product->description }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="description">Shipping and Returns</label>
+                                    <textarea value="{{ $product->shipping_returns }}" name="shipping_returns" id="shipping_returns" cols="30" rows="10" class="summernote" placeholder="shipping resturns">{{ $product->shipping_returns }}</textarea>
                                 </div>
                             </div>                                            
                         </div>
@@ -199,6 +211,21 @@
                             <p class="error"></p>
                         </div>
                     </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">	
+                        <h2 class="h4 mb-3">Related product</h2>
+                        <div class="mb-3">
+                            <select multiple class="related-products w-100" name="related_products[]" id="related_products">
+                            @if (!empty($relatedProducts))
+                                @foreach ($relatedProducts as $relatedProduct)
+                                    <option selected value="{{ $relatedProduct->id }}">{{ $relatedProduct->name }}</option>
+                                @endforeach                              
+                            @endif
+                            </select>
+                            <p class="error"></p>
+                        </div>
+                    </div>
                 </div>                                 
             </div>
         </div>
@@ -216,6 +243,24 @@
 <!--custom js section-->
 @section('customjs')
 <script>
+//select2 file code 
+$('.related-products').select2({
+    ajax: {
+        url: '{{ route("products.getproducts") }}',
+        dataType: 'json',
+        tags: true,
+        multiple: true,
+        minimumInputLength: 3,
+        processResults: function (data) {
+            return {
+                results: data.tags
+            }
+        }
+    }
+});
+   
+
+//form sumbit
    $(document).ready(function() {
     $("#productForm").submit(function(event){
         event.preventDefault(); // Prevent default form submission behavior      

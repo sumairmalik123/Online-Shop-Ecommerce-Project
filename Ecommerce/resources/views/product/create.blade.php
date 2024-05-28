@@ -42,8 +42,20 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="mb-3">
+                                    <label for="description">Short Description</label>
+                                    <textarea name="short_description" id="short_description" cols="30" rows="10" class="summernote" placeholder="short_descrition"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
                                     <label for="description">Description</label>
                                     <textarea name="description" id="description" cols="30" rows="10" class="summernote" placeholder="Description"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="description">Shipping and Returns</label>
+                                    <textarea name="shipping_returns" id="shipping_returns" cols="30" rows="10" class="summernote" placeholder="shipping resturns"></textarea>
                                 </div>
                             </div>                                            
                         </div>
@@ -118,6 +130,17 @@
                             </div>                                         
                         </div>
                     </div>	                                                                      
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">	
+                        <h2 class="h4 mb-3">Related product</h2>
+                        <div class="mb-3">
+                            <select multiple class="related-products w-100" name="related_products[]" id="related_products">
+                            
+                            </select>
+                            <p class="error"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
@@ -198,6 +221,23 @@
 <!--custom js section-->
 @section('customjs')
 <script>
+//select2
+$('.related-products').select2({
+    ajax: {
+        url: '{{ route("products.getproducts") }}',
+        dataType: 'json',
+        tags: true,
+        multiple: true,
+        minimumInputLength: 3,
+        processResults: function (data) {
+            return {
+                results: data.tags
+            }
+        }
+    }
+});
+
+
    $(document).ready(function() {
     $("#productForm").submit(function(event){
         event.preventDefault(); // Prevent default form submission behavior      

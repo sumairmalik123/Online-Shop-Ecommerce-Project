@@ -29,13 +29,13 @@
 	<meta name="twitter:image" content="" />
 	<meta name="twitter:image:alt" content="" />
 	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 	
 
 	<link rel="stylesheet" type="text/css" href="{{ asset('Front/css/slick.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ asset('Front/css/slick-theme.css') }}" />
-        <link rel="stylesheet" type="text/css" href="{{ asset('Front/css/style.css') }}" />
-
-
+    <link rel="stylesheet" type="text/css" href="{{ asset('Front/css/style.css') }}" />
+	<link rel="stylesheet" type="text/css" href="{{ asset('Front/css/ion.rangeSlider.min.css') }}" />
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,7 +96,7 @@
                             @if ($category->subCategories->isNotEmpty())
                                 <ul class="dropdown-menu dropdown-menu-dark">
                                     @foreach ($category->subCategories as $subCategory)
-                                    <li><a class="dropdown-item nav-link" href="#">{{ $subCategory->name }}</a></li>
+                                    <li><a class="dropdown-item nav-link" href="{{ route('front.shop',[$category->slug,$subCategory->slug]) }}">{{ $subCategory->name }}</a></li>
                                     @endforeach
                                 </ul>
                                 
@@ -174,6 +174,7 @@
 <script src="{{ asset('Front/js/lazyload.17.6.0.min.js') }}"></script>
 <script src="{{ asset('Front/js/slick.min.js') }}"></script>
 <script src="{{ asset('Front/js/custom.js') }}"></script>
+<script src="{{ asset('Front/js/ion.rangeSlider.min.js') }}"></script>
 <script>
 window.onscroll = function() {myFunction()};
 
@@ -187,7 +188,32 @@ function myFunction() {
     navbar.classList.remove("sticky");
   }
 }
+$.ajaxSetup({
+	headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+});
+function addToCart(productId) {
+        $.ajax({
+            type: "post",
+            url: "{{ route('front.addtocart') }}",
+            data: {
+                productId: productId,
+               // quantity: 1, // You can modify this value to set the default quantity
+            },
+            dataType: "json",
+            success: function(response) {
+                
+                if (response.status == true) {
+                    window.location.href = "{{ route('front.cart') }}";
+                } else {
+                    alert(response.message);
+                }
+            }
+        });
+    }
 </script>
+@yield('customjs')
 </body>
 </html>
 <!-- Footer End -->

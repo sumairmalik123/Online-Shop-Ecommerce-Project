@@ -3,6 +3,7 @@
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\LoginController;
@@ -30,7 +31,13 @@ use App\Http\Controllers\admin\ProductImageController;
  //   return view('welcome');
 //});
 Route::get('/',[FrontController::class,'index'])->name('front.home');
-Route::get('/shop',[ShopController::class,'index'])->name('front.shop');
+Route::get('/shop/{categorySlug?}/{subCategorySlug?}',[ShopController::class,'index'])->name('front.shop');
+Route::get('/product/{slug}',[ShopController::class,'product'])->name('front.product');
+Route::get('/cart',[CartController::class,'cart'])->name('front.cart');
+Route::post('/cart/add',[CartController::class,'addToCart'])->name('front.addtocart');
+Route::post('/cart/update',[CartController::class,'updateCart'])->name('front.updateCart');
+
+
 
 //auth middleware
 Route::prefix('account')->group(function () {
@@ -72,6 +79,10 @@ Route::prefix('account')->group(function () {
         Route::get('/products/edit/{product}',[ProductController::class, 'edit'])->name('products.edit');
         Route::post('/product/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/product/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+        // realted product fetch
+        Route::get('/get-products', [ProductController::class, 'getRelatedProduct'])->name('products.getproducts');
+
+
 
         //productsubcategory route
         Route::get('/product-subcatogries',[ProductSubController::class,'index'])->name('product-subcatogries.index');

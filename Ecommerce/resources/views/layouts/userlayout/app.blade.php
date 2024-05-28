@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/dropzone/min/dropzone.min.css') }}">
     <!-- Summernote -->
     <link rel="stylesheet" href="{{ asset('assets/plugins/summernote/summernote.min.css') }}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
+
     <!-- Custom css -->
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css')}}">
     <!-- CSRF Token -->
@@ -86,6 +89,8 @@
     <script src="{{ asset('assets/plugins/dropzone/min/dropzone.min.js') }}"></script>
     <!-- Summernote -->
     <script src="{{ asset('assets/plugins/summernote/summernote.min.js') }}"></script>
+    <!-- Select2 -->
+    <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}"></script>
     <!-- Custom Script -->
     <script>
         $(document).ready(function() {
@@ -93,6 +98,8 @@
                 height: 200
             });
         });
+
+        
     </script>
     @yield('customjs')
 </body>

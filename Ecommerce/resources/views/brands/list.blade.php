@@ -33,6 +33,7 @@
         </div>
         @endif
         <form action="" method="get">
+        @csrf
         <div class="card">
             <div class="card-header">
                 <div class="card-heading" style="display: inline-block;" >

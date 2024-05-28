@@ -73,6 +73,9 @@ class ProductController extends Controller
         $product->brand_id = $request->brand;
         $product->status = $request->status;
         $product->is_featured = $request->is_featured;
+        $product->shipping_returns = $request->shipping_returns;
+        $product->short_description = $request->short_description;
+        $product->related_products = (!empty($request->related_products)) ? implode(',',$request->related_products) : '';
         $product->save();
 
 
@@ -143,6 +146,12 @@ class ProductController extends Controller
              //Handle the case when the product is not found
           //abort(404);
        }
+       //fetch related products
+       $relatedProducts = [];
+    if ($product->related_products != '') {
+        $productsArray = explode(',', $product->related_products);
+        $relatedProducts = Product::whereIn('id', $productsArray)->get();
+    }
     
         // Retrieve subcategories based on the product's category ID
         $productImages = ProductImage::where('product_id', $product->id)->get();
@@ -150,7 +159,7 @@ class ProductController extends Controller
         $categories = Category::orderBy('name', 'asc')->get();
         $brands = Brand::orderBy('name', 'asc')->get();
     
-        return view('product.edit', compact('product', 'categories', 'subcategories', 'brands', 'productImages'));
+        return view('product.edit', compact('product', 'categories', 'subcategories', 'brands', 'productImages', 'relatedProducts'));
     }
     
 
@@ -190,6 +199,11 @@ public function update($id, Request $request)
     $product->brand_id = $request->brand;
     $product->status = $request->status;
     $product->is_featured = $request->is_featured;
+    $product->shipping_returns = $request->shipping_returns;
+    $product->short_description = $request->short_description;
+    $product->related_products = (!empty($request->related_products)) ? implode(',',$request->related_products) : '';
+
+
     $product->save();
 
 
@@ -234,6 +248,27 @@ public function destroy($id, Request $request)
             'status' => true,
             'message' => 'Product deleted successfully.'
         ]);
+}
+
+//get related product
+
+public function getRelatedProduct(Request $request)
+{
+    $tempProduct = [];
+    if ($request->term != "") {
+        $products = Product::where('title', 'like', '%' . $request->term . '%')->get();
+        if ($products != null) {
+            foreach ($products as $product) {
+                $tempProduct[] = array('id' => $product->id, 'text' => $product->title);
+            }
+        }
+    }
+
+    return response()->json([
+        'tags' => $tempProduct,
+        'status' => true
+    ]);
+    
 }
 
 }
