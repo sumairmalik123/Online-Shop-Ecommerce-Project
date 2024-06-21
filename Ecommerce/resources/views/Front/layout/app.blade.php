@@ -50,13 +50,17 @@
 	<div class="container">
 		<div class="row align-items-center py-3 d-none d-lg-flex justify-content-between">
 			<div class="col-lg-4 logo">
-				<a href="index.php" class="text-decoration-none">
+				<a href="{{ route("front.home") }}" class="text-decoration-none">
 					<span class="h1 text-uppercase text-primary bg-dark px-2">Online</span>
 					<span class="h1 text-uppercase text-dark bg-primary px-2 ml-n1">SHOP</span>
 				</a>
 			</div>
 			<div class="col-lg-6 col-6 text-left  d-flex justify-content-end align-items-center">
-				<a href="account.php" class="nav-link text-dark">My Account</a>
+				@if (Auth::check())
+				<a href="{{ route('user.dashboard') }}" class="nav-link text-dark">My Account</a>
+				@else
+				<a href="{{ route('user.login') }}" class="nav-link text-dark">Login/Register</a>
+				@endif
 				<form action="">					
 					<div class="input-group">
 						<input type="text" placeholder="Search For Products" class="form-control" aria-label="Amount (to the nearest dollar)">
@@ -106,7 +110,7 @@
                     @endif
                         
 			<div class="right-nav py-0">
-				<a href="cart.php" class="ml-3 d-flex pt-2">
+				<a href="{{ route("front.cart") }}" class="ml-3 d-flex pt-2">
 					<i class="fas fa-shopping-cart text-primary"></i>					
 				</a>
 			</div> 		
@@ -194,24 +198,25 @@ $.ajaxSetup({
             },
 });
 function addToCart(productId) {
-        $.ajax({
-            type: "post",
-            url: "{{ route('front.addtocart') }}",
-            data: {
-                productId: productId,
-               // quantity: 1, // You can modify this value to set the default quantity
-            },
-            dataType: "json",
-            success: function(response) {
-                
-                if (response.status == true) {
-                    window.location.href = "{{ route('front.cart') }}";
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
+  $.ajax({
+    url: "{{ route('front.addtocart') }}",
+    type: "post",
+    dataType: 'json',
+    data: { productId: productId },
+    success: function(response) {
+      if (response.status) { 
+        window.location.href = "{{ route('front.cart') }}";
+      } else {
+        alert(response.message);
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.error('Error adding item to cart:', textStatus, errorThrown);
+      alert('There was a problem adding the item. Please try again.');
     }
+  });
+}
+
 </script>
 @yield('customjs')
 </body>

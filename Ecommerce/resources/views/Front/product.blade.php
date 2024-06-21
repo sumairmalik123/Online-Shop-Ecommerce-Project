@@ -137,5 +137,7 @@
 @endsection
 
 @section('customjs')
+<script type="text/javascript">
 
+</script>
 @endsection

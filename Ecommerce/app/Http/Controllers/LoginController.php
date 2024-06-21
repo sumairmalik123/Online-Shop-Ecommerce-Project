@@ -20,19 +20,19 @@ class LoginController extends Controller
             'email' => 'required|email',
             'password' => 'required'
         ]);
+    
         if($validator->passes()){
-            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])){
-                 return redirect()->route('account.dashboard');
-                 if(Auth::guard('web')->user()->role == 'customer'){
+            if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])){
+                $admin = Auth::guard('admin')->user();
+                if ($admin->role === 'admin') {
                     return redirect()->route('account.dashboard');
                 } else {
-                    Auth::logout();
-                    return redirect()->route('account.login')->with('error', 'Only customers can login.');
+                    Auth::guard('admin')->logout();
+                    return redirect()->route('account.login')->with('error', 'Only admin can login.');
                 }
             }else{
                 return redirect()->route('account.login')->with('error', 'Either mail and password is incorrect.');
             }
-
         } else {
             return redirect()->route('account.login')->withErrors($validator);
         }
@@ -65,7 +65,7 @@ class LoginController extends Controller
 
     //logout
     public function logout(){
-        Auth::logout();
+        Auth::guard('admin')->logout();
         return redirect()->route('account.login');
     }
 }
