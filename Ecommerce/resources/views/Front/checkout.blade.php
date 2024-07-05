@@ -349,7 +349,7 @@
     });
   });
 
-  //apply coupon
+  //apply coupon/discount
   $("#apply_discount").click(function(){
     var discount_code = $("#discount_code").val();
     $.ajax({
@@ -369,7 +369,7 @@
           $("#discount-row-wrapper").html(response.discountString);
 
         } else {
-$("#discount-row-wrapper").html("<span class='text-danger'> " + response.message + "</span>");
+           $("#discount-row-wrapper").html("<span class='text-danger'> " + response.message + "</span>");
         }
       }
     });
@@ -390,7 +390,7 @@ $("#discount-row-wrapper").html("<span class='text-danger'> " + response.message
             $("#shippingAmount").html('$'+response.shippingCharge);
           $("#grandTotal").html('$'+response.grandTotal);
           $("#discount_value").html('$'+response.discount);
-           $("discount-row").html('');
+           $("#discount-row").html('');
            $('#discount_code').val('');
         }
       }

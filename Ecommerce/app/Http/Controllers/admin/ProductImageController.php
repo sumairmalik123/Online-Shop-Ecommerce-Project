@@ -31,10 +31,17 @@ if ($request->image) {
             $constraint->aspectRatio();
         });
         $img->save($thumbpath);
+
+        //small
+        $thumbpath = public_path() . '/uploads/category/product/small/' . $imageName;
+        $img = Image::make($sourcepath);
+        $img->fit(300, 300);
+        $img->save($thumbpath);
+
         return response()->json([
             'status' => true, 
             'image_id' => $productImage->id,
-            'imagepath' => asset('/uploads/category/product/large/' .$productImage->image),
+            'imagepath' => asset('/uploads/category/product/small/' .$productImage->image),
             'message' => 'Image uploaded successfully']);
     } else {
         return response()->json(['status' => false, 'message' => 'No image uploaded.']);

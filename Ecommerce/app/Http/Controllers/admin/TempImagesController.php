@@ -7,35 +7,59 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Intervention\Image\Facades\Image;
 
-    class TempImagesController extends Controller
+class TempImagesController extends Controller
 {
 
-    public function create(Request $request) {
-        $image = $request->image; // file sa jo image ka parameter hai osko access kia hai
-        if (!empty($image)) {
-            $ext = $image->getClientOriginalExtension(); // image ka extension nikalny ka tareeqa
-           $newName = time() . '.' . $ext; // file ka naya name
-           $tempImage = new TempImage(); // model ke object banany ka tareeqa means table name 
-           $tempImage->name = $newName; // yaha pr name column ka name hai
-           $tempImage->save();// yaha pr save karny ka tareeqa
-           $image->move(public_path().'/temp',$newName); // yaha pr image move karny ka tareeqa or /temp folder ka name hai 
-           // or ya uper waly uper waly image move karny ka tareeqa jo request kia hai      
+    public function create(Request $request)
+    {
+        $image = $request->image; // File object from the request
 
-               //image thumbnail
-               //$sourcepath = public_path().'/temp' . $newName;
-               //$thumbpath = public_path().'/temp/thumb/' . $newName;
-               //$img = Image::make($sourcepath);
-               //$img->fit(450, 600);
-              // $img->save($thumbpath);
+        if (!empty($image) && $image->isValid()) {
+            $ext = $image->getClientOriginalExtension();
+            $newName = time() . '.' . $ext;
 
-               
-           return response()->json([
-               'status' => true,
-               'image_id' => $tempImage->id,
-               'imagepath' => asset('/temp/thumb/' .$newName),
-               'message' => 'Image uploaded successfully'
-           ]);
+            $tempImage = new TempImage();
+            $tempImage->name = $newName;
+            $tempImage->save();
+
+            $sourcepath = public_path('temp/' . $newName); // Absolute path to uploaded file
+
+            // Move the uploaded file to the temp directory
+            if ($image->move(public_path('temp'), $newName)) {
+                // File uploaded successfully
+                $thumbpath = public_path('temp/thumb/' . $newName);
+
+                try {
+                    $img = Image::make($sourcepath);
+                    $img->fit(300, 275);
+                    $img->save($thumbpath);
+
+                    return response()->json([
+                        'status' => true,
+                        'image_id' => $tempImage->id,
+                        'imagepath' => asset('/temp/thumb/' . $newName),
+                        'message' => 'Image uploaded successfully',
+                    ]);
+                } catch (Intervention\Image\Exception\NotReadableException $e) {
+                    // Handle "Image source not readable" exception
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Error processing image: ' . $e->getMessage(),
+                    ], 500); // Internal Server Error
+                }
+            } else {
+                // Error moving the uploaded file
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Error uploading image.',
+                ]);
+            }
+        } else {
+            // No image uploaded or invalid file
+            return response()->json([
+                'status' => false,
+                'message' => 'No image uploaded or invalid file.',
+            ]);
+        }
     }
-}
-
 }

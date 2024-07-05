@@ -2,7 +2,7 @@
     <!-- Brand Logo -->
     <a href="#" class="brand-link">
         <img src="{{ asset('assets/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">User</span>
+        <span class="brand-text font-weight-light">Admin Panel</span>
     </a>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -12,7 +12,7 @@
                 <!-- Add icons to the links using the .nav-icon class
                     with font-awesome or any other icon font library -->
                 <li class="nav-item">
-                    <a href="dashboard.html" class="nav-link">
+                    <a href="{{ route('account.dashboard') }}" class="nav-link">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Dashboard</p>
                     </a>																
@@ -43,6 +43,12 @@
                         <p>Products</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('products.productRatings') }}" class="nav-link">
+                        <i class="nav-icon fas fa-star"></i>
+                        <p>Rating</p>
+                    </a>
+                </li>
                 
                 <li class="nav-item">
                     <a href="{{ route('shipping.create') }}" class="nav-link">
@@ -52,7 +58,7 @@
                     </a>
                 </li>							
                 <li class="nav-item">
-                    <a href="{{ route('shipping.create') }}" class="nav-link">
+                    <a href="{{ route('order.list') }}" class="nav-link">
                         <i class="nav-icon fas fa-shopping-bag"></i>
                         <p>Orders</p>
                     </a>
@@ -64,13 +70,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="users.html" class="nav-link">
+                    <a href="{{ route('users.list') }}" class="nav-link">
                         <i class="nav-icon  fas fa-users"></i>
                         <p>Users</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="pages.html" class="nav-link">
+                    <a href="{{ route('pages.list') }}" class="nav-link">
                         <i class="nav-icon  far fa-file-alt"></i>
                         <p>Pages</p>
                     </a>

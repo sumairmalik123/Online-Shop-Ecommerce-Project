@@ -61,12 +61,12 @@
 				@else
 				<a href="{{ route('user.login') }}" class="nav-link text-dark">Login/Register</a>
 				@endif
-				<form action="">					
+				<form action="{{ route('front.shop') }}" method="get">					
 					<div class="input-group">
-						<input type="text" placeholder="Search For Products" class="form-control" aria-label="Amount (to the nearest dollar)">
-						<span class="input-group-text">
+						<input value="{{ Request::get('search') }}" type="text" placeholder="Search For Products" class="form-control" name="search" id="search">
+						<button type="submit" class="input-group-text">
 							<i class="fa fa-search"></i>
-					  	</span>
+					  	</button>
 					</div>
 				</form>
 			</div>		
@@ -139,11 +139,12 @@
 				<div class="footer-card">
 					<h3>Important Links</h3>
 					<ul>
-						<li><a href="about-us.php" title="About">About</a></li>
-						<li><a href="contact-us.php" title="Contact Us">Contact Us</a></li>						
-						<li><a href="#" title="Privacy">Privacy</a></li>
-						<li><a href="#" title="Privacy">Terms & Conditions</a></li>
-						<li><a href="#" title="Privacy">Refund Policy</a></li>
+						@if (staticPages()->isNotEmpty())
+							@foreach(staticPages() as $page)
+							<li><a href="{{ route('front.showfrontpage', $page->slug) }}" title="{{ $page->name }}">{{ $page->name }}</a></li>
+							@endforeach
+							
+						@endif
 					</ul>
 				</div>
 			</div>
@@ -172,6 +173,24 @@
 		</div>
 	</div>
 </footer>
+
+<!-- Wishlist Modal -->
+<div class="modal fade" id="wishlistModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Success</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+		  ...
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
 <script src="{{ asset('Front/js/jquery-3.6.0.min.js') }}"></script>
 <script src="{{ asset('Front/js/bootstrap.bundle.5.1.3.min.js') }}"></script>
 <script src="{{ asset('Front/js/instantpages.5.1.0.min.js') }}"></script>
@@ -214,6 +233,23 @@ function addToCart(productId) {
       console.error('Error adding item to cart:', textStatus, errorThrown);
       alert('There was a problem adding the item. Please try again.');
     }
+  });
+}
+
+function addToWishList(productId) {
+  $.ajax({
+	url: "{{ route('front.addToWishlist') }}",
+	type: "post",
+	dataType: 'json',
+	data: { productId: productId },
+	success: function(response) {
+		if (response.status == true) { 
+			$("#wishlistModal .modal-body").html(response.message);
+             $("#wishlistModal").modal('show');
+      } else {
+        window.location.href = "{{ route('user.login') }}";
+      }
+	}
   });
 }
 

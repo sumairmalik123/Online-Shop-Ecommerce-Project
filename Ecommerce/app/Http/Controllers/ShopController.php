@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
+use App\Models\ProductRating;
+use Illuminate\Support\Facades\Validator;
 
 class ShopController extends Controller
 {
@@ -56,6 +58,11 @@ class ShopController extends Controller
             }
             $products = $products->whereBetween('price', [intval($request->get('price_min')) , intval($request->get('price_max'))]);
         }
+          //front search method
+        if (!empty($request->get('search') != '')) {
+            $products = $products->where('title', 'like', '%' . $request->get('search') . '%');
+        }
+
 
         //$products = $products->orderBy('id', 'DESC');
         if ($request->get('sort') != '') {
@@ -88,7 +95,11 @@ class ShopController extends Controller
     public function product($slug)
     {
         //echo $slug;
-        $product = Product::where('slug', $slug)->with('product_images')->first();
+        $product = Product::where('slug', $slug)
+        ->withCount('product_ratings')
+        ->withSum('product_ratings','rating')
+        ->with(['product_images','product_ratings'])
+        ->first();
         if ($product == null) {
             abort(404);
         }
@@ -97,10 +108,57 @@ class ShopController extends Controller
         $relatedProducts = [];
         if ($product->related_products != '') {
             $productsArray = explode(',', $product->related_products);
-            $relatedProducts = Product::whereIn('id', $productsArray)->with('product_images')->get();
+            $relatedProducts = Product::whereIn('id', $productsArray)->where('status',1)->with('product_images')->get();
+        }
+
+        //Rating Calculation
+        //"product_ratings_count" => 2
+        //"product_ratings_sum_rating" => 9.0
+        $avgRating = '0.00';
+        $avgRatingPer = 0;
+        if ($product->product_ratings_count > 0) {
+        $avgRating = number_format(($product->product_ratings_sum_rating/$product->product_ratings_count),2);
+        $avgRatingPer = ($avgRating*100)/5;
         }
     
-        return view('Front.product', compact('product', 'relatedProducts'));
+        return view('Front.product', compact('product', 'relatedProducts','avgRating','avgRatingPer'));
+    }
+    public function saveRating(Request $request, $productId){
+    $validator = Validator::make($request->all(),[
+            'name' => 'required|min:6',
+            'email' => 'required|email',
+            'comment' => 'required|min:10',
+            'rating' => 'required',
+        ]);
+        if($validator->fails()){
+            return response()->json([
+                'status' => false,
+                'error' => $validator->errors()
+            ]);
+        }
+
+
+        $count = ProductRating::where('email', $request->email)->count();
+        if ($count > 0) {
+        session()->flash('error', 'You have already rated this product.');
+        return response()->json([
+            'status' => true, // Indicate error
+            'message' => 'You have already rated this product.',
+        ]);
+    }
+        $productRating = new ProductRating;
+        $productRating->product_id = $productId;
+        $productRating->username = $request->name;
+        $productRating->email = $request->email;
+        $productRating->comment = $request->comment;
+        $productRating->rating = $request->rating;
+        $productRating->status = 0;
+        $productRating->save();
+        session()->flash('success','Thank you for your feedback!');
+        return response()->json([
+            'status' => true,
+            'message' => 'Thank you for your feedback!'
+        ]);
     }
 
 }

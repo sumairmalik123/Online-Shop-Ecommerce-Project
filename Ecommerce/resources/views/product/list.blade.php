@@ -65,9 +65,9 @@
 						<td>{{ $product->id }}</td>
 						<td>
 								@if (!empty($img))
-									<img src="{{ asset('uploads/category/product/large/'.$img->image) }}" class="img-thumbnail" width="50">
+									<img src="{{ asset('uploads/category/product/small/'.$img->image) }}" class="img-thumbnail" width="50">
 								@else
-									<img src="{{ asset('temp/1715515329.png') }}" class="img-thumbnail" width="50">
+									<img src="{{ asset('uploads/placeholder.jpg') }}" class="img-thumbnail" width="50">
 								@endif
 						</td>								
 						<td><a href="#">{{ $product->title }}</a></td>

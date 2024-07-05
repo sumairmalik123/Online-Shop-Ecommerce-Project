@@ -8,14 +8,14 @@
                 <!-- <img src="images/carousel-1.jpg" class="d-block w-100" alt=""> -->
 
                 <picture>
-                    <source media="(max-width: 799px)" srcset="{{ asset('Front/images/carousel-1-m.jpg') }}" />
-                    <source media="(min-width: 800px)" srcset="{{ asset('Front/images/carousel-1.jpg') }}" />
-                    <img src="{{ asset('Front/images/carousel-1.jpg') }}" alt="" />
+                    <source media="(max-width: 799px)" srcset="{{ asset('Front/images/image-1.jpeg') }}" />
+                    <source media="(min-width: 800px)" srcset="{{ asset('Front/images/image-2.jpeg') }}" />
+                    <img src="{{ asset('Front/images/image-3.jpeg') }}" alt="" />
                 </picture>
 
                 <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3">
-                        <h1 class="display-4 text-white mb-3">Kids Fashion</h1>
+                        <h1 class="display-4 text-white mb-3">Laptop</h1>
                         <p class="mx-md-5 px-5">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
                         <a class="btn btn-outline-light py-2 px-4 mt-3" href="#">Shop Now</a>
                     </div>
@@ -24,14 +24,14 @@
             <div class="carousel-item">
                 
                 <picture>
-                    <source media="(max-width: 799px)" srcset="{{ asset('Front/images/carousel-2-m.jpg') }}" />
-                    <source media="(min-width: 800px)" srcset="{{ asset('Front/images/carousel-2.jpg') }}" />
-                    <img src="{{ asset('Front/images/carousel-2.jpg') }}" alt="" />
+                    <source media="(max-width: 799px)" srcset="{{ asset('Front/images/image-4.jpeg') }}" />
+                    <source media="(min-width: 800px)" srcset="{{ asset('Front/images/image-5.jpeg') }}" />
+                    <img src="{{ asset('Front/images/image-2.jpeg') }}" alt="" />
                 </picture>
 
                 <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3">
-                        <h1 class="display-4 text-white mb-3">Womens Fashion</h1>
+                        <h1 class="display-4 text-white mb-3">Del Laptop</h1>
                         <p class="mx-md-5 px-5">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
                         <a class="btn btn-outline-light py-2 px-4 mt-3" href="#">Shop Now</a>
                     </div>
@@ -41,14 +41,14 @@
                 <!-- <img src="images/carousel-3.jpg" class="d-block w-100" alt=""> -->
 
                 <picture>
-                    <source media="(max-width: 799px)" srcset="{{ asset('Front/images/carousel-3-m.jpg') }}" />
-                    <source media="(min-width: 800px)" srcset="{{ asset('Front/images/carousel-3.jpg') }}" />
-                    <img src="{{ asset('Front/images/carousel-2.jpg') }}" alt="" />
+                    <source media="(max-width: 799px)" srcset="{{ asset('Front/images/image-3.jpeg') }}" />
+                    <source media="(min-width: 800px)" srcset="{{ asset('Front/images/image-1.jpeg') }}" />
+                    <img src="{{ asset('Front/images/image-2.jpeg') }}" alt="" />
                 </picture>
 
                 <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3">
-                        <h1 class="display-4 text-white mb-3">Shop Online at Flat 70% off on Branded Clothes</h1>
+                        <h1 class="display-4 text-white mb-3">Shop Online at Flat 70% off on Branded Laptop</h1>
                         <p class="mx-md-5 px-5">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
                         <a class="btn btn-outline-light py-2 px-4 mt-3" href="#">Shop Now</a>
                     </div>
@@ -146,18 +146,29 @@
                         <a href="{{ route("front.product",$product->slug) }}" class="product-img">
                             
                             @if (!empty($img))
-                            <img  class="card-img-top"  src="{{ asset('uploads/category/product/large/'.$img->image) }}" class="img-thumbnail">
+                            <img  class="card-img-top"  src="{{ asset('uploads/category/product/small/'.$img->image) }}" class="img-thumbnail">
                         @else
-                            <img src="{{ asset('temp/1715515329.png') }}" class="img-thumbnail" >
+                            <img src="{{ asset('uploads/placeholder.jpg') }}" class="img-thumbnail" >
                         @endif
                         
                         </a>
-                        <a class="whishlist" href="222"><i class="far fa-heart"></i></a>                            
-
+                        <a onclick="addToWishList({{ $product->id }})" class="whishlist" href="javascript:void(0);"><i class="far fa-heart"></i></a>
                         <div class="product-action">
+                            @if ($product->track_qty == 'Yes')
+                                @if ($product->qty > 0)
                             <a class="btn btn-dark" href="javascript:void(0);" onclick="addToCart({{ $product->id }})">
                                 <i class="fa fa-shopping-cart"></i> Add To Cart
-                            </a>                            
+                            </a>
+                                 @else
+                            <a class="btn btn-dark" href="javascript:void(0);">
+                                 Out OF Stock
+                            </a>
+                            @endif
+                            @else
+                            <a class="btn btn-dark" href="javascript:void(0);" onclick="addToCart({{ $product->id }})">
+                                <i class="fa fa-shopping-cart"></i> Add To Cart
+                            </a>
+                            @endif                            
                         </div>
                     </div>                        
                     <div class="card-body text-center mt-3">
@@ -195,18 +206,30 @@
                         <a href="{{ route("front.product",$product->slug) }}" class="product-img">
                             
                             @if (!empty($img))
-                            <img  class="card-img-top"  src="{{ asset('uploads/category/product/large/'.$img->image) }}" class="img-thumbnail">
+                            <img  class="card-img-top"  src="{{ asset('uploads/category/product/small/'.$img->image) }}" class="img-thumbnail">
                         @else
-                            <img src="{{ asset('temp/1715515329.png') }}" class="img-thumbnail" >
+                            <img src="{{ asset('uploads/placeholder.jpg') }}" class="img-thumbnail" >
                         @endif
                         
                         </a>
-                        <a class="whishlist" href="222"><i class="far fa-heart"></i></a>                            
+                        <a onclick="addToWishList({{ $product->id }})" class="whishlist" href="javascript:void(0);"><i class="far fa-heart"></i></a>
 
                         <div class="product-action">
+                            @if ($product->track_qty == 'Yes')
+                                @if ($product->qty > 0)
                             <a class="btn btn-dark" href="javascript:void(0);" onclick="addToCart({{ $product->id }})">
                                 <i class="fa fa-shopping-cart"></i> Add To Cart
-                            </a>                            
+                            </a>
+                                 @else
+                            <a class="btn btn-dark" href="javascript:void(0);">
+                                 Out OF Stock
+                            </a>
+                            @endif
+                            @else
+                            <a class="btn btn-dark" href="javascript:void(0);" onclick="addToCart({{ $product->id }})">
+                                <i class="fa fa-shopping-cart"></i> Add To Cart
+                            </a>
+                            @endif                            
                         </div>
                     </div>                        
                     <div class="card-body text-center mt-3">

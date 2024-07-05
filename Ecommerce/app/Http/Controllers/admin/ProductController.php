@@ -9,6 +9,7 @@ use App\Models\TempImage;
 use App\Models\SubCategory;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use App\Models\ProductRating;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
@@ -226,28 +227,46 @@ public function update($id, Request $request)
 public function destroy($id, Request $request)
 {
     $product = Product::find($id);
-    $request->session()->flash('error','Product not found');
-    if(empty($product)){
+    $request->session()->flash('error', 'Product not found');
+    if (empty($product)) {
         return response()->json([
             'status' => false,
             'notfound' => true,
-            'message' => 'Product not found.'
+            'message' => 'Product not found.',
         ]);
     }
+
     $productImages = ProductImage::where('product_id', $id)->get();
-    if(!empty($productImages)){
-        foreach($productImages as $productImage){
-            File::delete(public_path('/uploads/category/product/large/' . $productImage->image));
-            File::delete(public_path('/uploads/category/product/small/' . $productImage->image));
+
+    // Delete product images with error handling
+    if (!empty($productImages)) {
+        foreach ($productImages as $productImage) {
+            $imagePathLarge = public_path('/uploads/category/product/large/' . $productImage->image);
+            $imagePathSmall = public_path('/uploads/category/product/small/' . $productImage->image);
+
+            // Check if file exists before deleting
+            if (File::exists($imagePathLarge)) {
+                File::delete($imagePathLarge);
+            }
+            if (File::exists($imagePathSmall)) {
+                File::delete($imagePathSmall);
+            } else {
+                // Optional: Log or handle missing image scenario
+            }
         }
-        $productImage::where('product_id', $id)->delete();
     }
+
+    // Delete product image entries from database
+    $productImage->delete();
+
+    // Delete product
     $product->delete();
-    $request->session()->flash('success','Product deleted successfully');
-        return response()->json([
-            'status' => true,
-            'message' => 'Product deleted successfully.'
-        ]);
+
+    $request->session()->flash('success', 'Product deleted successfully');
+    return response()->json([
+        'status' => true,
+        'message' => 'Product deleted successfully.',
+    ]);
 }
 
 //get related product
@@ -269,6 +288,32 @@ public function getRelatedProduct(Request $request)
         'status' => true
     ]);
     
+}
+public function productRatings(Request $request){
+
+    $ratings = ProductRating::select('product_ratings.*','products.title as productTitle')->
+    orderBy('product_ratings.created_at','DESC');
+    $ratings = $ratings->leftJoin('products','products.id','product_ratings.product_id');
+    if (($request->get('keyword') !== "")) {
+        $ratings = $ratings->orWhere('products.title', 'like', '%' . $request->get('keyword') . '%');
+        $ratings = $ratings->orWhere('product_ratings.username', 'like', '%' . $request->get('keyword') . '%');
+
+      }
+    $ratings = $ratings->paginate(10);
+    return view('product.ratings',[
+        'ratings' => $ratings
+    ]);    
+}
+public function changeRatingStatus(Request $request){
+
+    $rating = ProductRating::find($request->id);
+    $rating->status = $request->status;
+    $rating->save();
+    session()->flash('success', 'Status Change Successfully.');
+
+    return response()->json([
+        'status' => true
+    ]);
 }
 
 }

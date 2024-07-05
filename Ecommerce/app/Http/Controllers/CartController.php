@@ -292,9 +292,9 @@ if (session()->has('code')) {
     $order->subtotal = $subTotal;
     $order->shipping = $shipping;
     $order->discount = $discount;
-    //$order->coupon_code_d = $discountCodeId;
+    $order->coupon_code_id = $discountCodeId;
     $order->coupon_code = $promoCode;
-    $order->payment_status = 'not paid';
+    $order->payment_status = 'not_paid';
     $order->status = 'pending';
     $order->grand_total = $grandTotal;
     $order->first_name = $customerAddress->first_name;
@@ -309,7 +309,6 @@ if (session()->has('code')) {
     $order->zip = $customerAddress->zip;
     $order->notes = $request->order_notes;
     $order->save();
-
 //step.4 save data in order details table
      foreach(Cart::content() as $item){
         $orderItem = new OrderItem;
@@ -320,7 +319,20 @@ if (session()->has('code')) {
         $orderItem->price = $item->price;
         $orderItem->total = $item->price*$item->qty;
         $orderItem->save();
+        //update product stock
+        $productData = Product::find($item->id);
+        if ($productData->track_qty == 'Yes'){
+            $currentQty = $productData->qty;
+            $updatedQty = $currentQty-$item->qty;
+            $productData->qty = $updatedQty;
+            $productData->save();
+        }
+       
      }
+
+     //Send Order email
+       orderEmail($order->id,'customer');
+
         session()->flash('success','You have successfully placed your order.');
           //finally, clear the cart
      Cart::destroy();
@@ -400,7 +412,7 @@ if (session()->has('code')) {
                         'status' => true,
                         'grandTotal' => number_format($grandTotal,2),
                         'shippingCharge' => number_format(0,2),
-                       // 'discount' => $discounts,
+                        'discount' => $discount,
                     ]);
                 }
             }

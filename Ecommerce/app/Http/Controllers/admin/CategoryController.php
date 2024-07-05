@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
 
+
 class CategoryController extends Controller
 {
     public function index(Request $request) {

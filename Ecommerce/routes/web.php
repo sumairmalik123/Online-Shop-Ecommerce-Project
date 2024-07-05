@@ -8,9 +8,13 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\admin\PageController;
+use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\admin\BrandController;
 use App\Http\Controllers\admin\ProductController;
+use App\Http\Controllers\admin\SettingController;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\ShippingController;
 use App\Http\Controllers\admin\ProductSubController;
@@ -33,6 +37,9 @@ use App\Http\Controllers\admin\ProductImageController;
 //Route::get('/', function () {
  //   return view('welcome');
 //});
+//Route::get('/test', function () {
+   // orderEmail(20);
+//});
 Route::get('/',[FrontController::class,'index'])->name('front.home');
 Route::get('/shop/{categorySlug?}/{subCategorySlug?}',[ShopController::class,'index'])->name('front.shop');
 Route::get('/product/{slug}',[ShopController::class,'product'])->name('front.product');
@@ -46,6 +53,17 @@ Route::get('/thanks/{orderId}',[CartController::class,'thankyou'])->name('front.
 Route::post('/get-order-summary', [CartController::class, 'getOrdersummary'])->name('front.getOrdersummary');
 Route::post('/apply-discount', [CartController::class, 'applyDiscount'])->name('front.applyDiscount');
 Route::post('/remove-discount', [CartController::class, 'removeCoupon'])->name('front.removeCoupon');
+Route::post('/add-to-wishlist', [FrontController::class, 'addToWishlist'])->name('front.addToWishlist');
+Route::get('/page/{slug}',[FrontController::class,'showfrontpage'])->name('front.showfrontpage');
+Route::post('/send-contact-email',[FrontController::class,'sendContactEmail'])->name('front.sendContactEmail');
+Route::get('/forgot-password',[AuthController::class,'forgotPasword'])->name('front.forgotPasword');
+Route::post('/process-forgot-password',[AuthController::class,'sendForgotPasswordLink'])->name('front.sendForgotPasswordLink');
+Route::get('/reset-password/{token}',[AuthController::class,'resetPassword'])->name('front.resetpassword');
+Route::post('/process-reset-password',[AuthController::class,'processResetPassword'])->name('front.processResetPassword');
+Route::post('/save-rating/{productId}',[ShopController::class,'saveRating'])->name('front.saveRating');
+
+
+
 
 
 
@@ -65,7 +83,13 @@ Route::group(['prefix' => 'user'], function(){
 
     Route::group(['middleware' => 'auth'], function(){
         Route::get('/dashboard',[AuthController::class,'dashboard'])->name('user.dashboard');
+        Route::post('/update-profile',[AuthController::class,'updateProfile'])->name('user.updateProfile');
+        Route::post('/update-address',[AuthController::class,'updateAddress'])->name('user.updateAddress');
+        Route::get('/change-password',[AuthController::class,'showChangePasswordForm'])->name('user.changePassword');
+        Route::post('/process-change-password',[AuthController::class,'changePassword'])->name('user.changePasswordproecess');
         Route::get('/my-orders',[AuthController::class,'orders'])->name('user.orders');
+        Route::get('/my-wishlist',[AuthController::class,'wishlist'])->name('user.wishlist');
+        Route::post('/remove-product-from-wishlist',[AuthController::class,'removeProductFromWishlist'])->name('user.removeProductFromWishlist');
         Route::get('/order-detail/{orderId}',[AuthController::class,'orderDetail'])->name('user.orderDetail');
         Route::get('/logout',[AuthController::class,'logout'])->name('user.logout');
         
@@ -116,6 +140,11 @@ Route::prefix('account')->group(function () {
         Route::delete('/product/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
         // realted product fetch
         Route::get('/get-products', [ProductController::class, 'getRelatedProduct'])->name('products.getproducts');
+        // rating route
+        Route::get('/ratings',[ProductController::class,'productRatings'])->name('products.productRatings');
+        Route::get('/change-rating-status',[ProductController::class,'changeRatingStatus'])->name('products.changeRatingStatus');
+
+
 
 
 
@@ -141,6 +170,28 @@ Route::prefix('account')->group(function () {
         Route::post('/coupon/{coupon}', [DiscountCodeController::class, 'update'])->name('coupon.update');
         Route::delete('/coupon/{coupon}', [DiscountCodeController::class, 'destroy'])->name('coupon.destroy');
 
+        //order routes
+        Route::get('/order',[OrderController::class,'index'])->name('order.list');
+        Route::get('/order/{id}',[OrderController::class,'detail'])->name('order.detail');
+        Route::post('/order/change-status/{id}',[OrderController::class,'changeOrderStatus'])->name('order.changeOrderStatus');
+        Route::post('/order/send-invoice/{id}',[OrderController::class,'sendInvoiceEmail'])->name('order.sendInvoiceEmail');
+
+        //users route
+        Route::get('/users',[UserController::class,'index'])->name('users.list');
+        Route::get('/users/create',[UserController::class,'create'])->name('users.create');
+        Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{usersId}/edit',[UserController::class, 'edit'])->name('users.edit');
+        Route::post('/users/{usersId}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{usersId}', [UserController::class, 'destroy'])->name('users.destroy');
+
+        //pages route
+        Route::get('/pages',[PageController::class,'index'])->name('pages.list');
+        Route::get('/pages/create',[PageController::class,'create'])->name('pages.create');
+        Route::post('/pages/store', [PageController::class, 'store'])->name('pages.store');
+        Route::get('/pages/{pagesId}/edit',[PageController::class, 'edit'])->name('pages.edit');
+        Route::post('/pages/{pagesId}', [PageController::class, 'update'])->name('pages.update');
+        Route::delete('/pages/{pagesId}', [PageController::class, 'destroy'])->name('pages.destroy');
+
         //get slug method
         Route::get('/getSlug', function(Request $request) {
             $slug = '';
@@ -163,9 +214,12 @@ Route::prefix('account')->group(function () {
         Route::post('process-register', [LoginController::class, 'processregister'])->name('account.processregister');
         Route::post('/authenticate',[LoginController::class,'authenticate'])->name('account.authenticate');
         
-        
-        
     });
+
+    //setting route
+    Route::get('/admin-change-password', [SettingController::class, 'showChangeAdminPasswordForm'])->name('account.showChangeAdminPasswordForm');
+    Route::post('/admin-process-password', [SettingController::class, 'processChangePassword'])->name('account.processChangePassword');
+
 
 
 

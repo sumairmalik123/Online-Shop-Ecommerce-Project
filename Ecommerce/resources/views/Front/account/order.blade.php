@@ -39,7 +39,7 @@
                     <td>
                         <a href="{{ route('user.orderDetail',$order->id) }}">{{ $order->id }}</a>
                     </td>
-                    <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d,M,Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d M,Y') }}</td>
                     <td>
                         @if ($order->status == 'pending')
                         <span class="badge bg-danger">Pending</span>
@@ -56,7 +56,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="4">No order found.</td>
+                    <td colspan="3">No order found.</td>
                 </tr>   
                 @endif
                

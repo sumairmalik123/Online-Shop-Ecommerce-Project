@@ -216,10 +216,10 @@
                     <div class="card-body">	
                         <h2 class="h4 mb-3">Related product</h2>
                         <div class="mb-3">
-                            <select multiple class="related-products w-100" name="related_products[]" id="related_products">
+                            <select multiple class="related-product w-100" name="related_products[]" id="related_products">
                             @if (!empty($relatedProducts))
                                 @foreach ($relatedProducts as $relatedProduct)
-                                    <option selected value="{{ $relatedProduct->id }}">{{ $relatedProduct->name }}</option>
+                                    <option selected value="{{ $relatedProduct->id }}">{{ $relatedProduct->title }}</option>
                                 @endforeach                              
                             @endif
                             </select>
@@ -244,7 +244,7 @@
 @section('customjs')
 <script>
 //select2 file code 
-$('.related-products').select2({
+$('.related-product').select2({
     ajax: {
         url: '{{ route("products.getproducts") }}',
         dataType: 'json',

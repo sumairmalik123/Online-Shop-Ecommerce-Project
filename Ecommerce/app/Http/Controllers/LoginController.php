@@ -24,7 +24,7 @@ class LoginController extends Controller
         if($validator->passes()){
             if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])){
                 $admin = Auth::guard('admin')->user();
-                if ($admin->role === 'admin') {
+                if ($admin->role === 2) {
                     return redirect()->route('account.dashboard');
                 } else {
                     Auth::guard('admin')->logout();
